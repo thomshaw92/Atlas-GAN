@@ -1,5 +1,9 @@
 ourdata
 EATT_data
+EATT_tongue_data
 logs
 training_checkpoints
 ext/*
+*.sif
+*gz
+subjnames_EATT.csv
