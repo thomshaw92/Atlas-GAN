@@ -31,9 +31,16 @@ def D_data_generator(
     if dataset == 'dHCP':
         age_max = 45.142857142857  # used for scaling age values
         n_condns = 1  # number of conditions
-    elif dataset == 'pHD':
-        attribute = 'disease'  # name of attribute in npz archive
-        age_max = 87.72895277  # used for scaling age values
+    elif dataset == 'EATT':
+        attribute = 'attribute'  # name of attribute in npz archive
+        age_max = 74  # used for scaling age values
+        n_condns = 3  # number of conditions
+    elif dataset == 'qsm-simple':
+        age_max = 34  # used for scaling age values
+        n_condns = 1  # number of conditions
+    elif dataset == 'qsm-gender-and-age':
+        attribute = 'gender'  # name of attribute in npz archive
+        age_max = 34  # used for scaling age values
         n_condns = 3  # number of conditions
 
     # Oversample age:
@@ -66,7 +73,8 @@ def D_data_generator(
             reg_imgs_npz = np.load(reg_img_path)
 
             registration_images[i] = reg_imgs_npz['vol'][..., np.newaxis]
-            registration_images_condns[i] = reg_imgs_npz['age']/age_max
+            temp = reg_imgs_npz['age']/age_max
+            registration_images_condns[i] = temp
 
             if n_condns > 1:
                 registration_images_condns[i] = np.hstack((
@@ -123,11 +131,18 @@ def G_data_generator(
     if dataset == 'dHCP':
         age_max = 45.142857142857  # used for scaling age values
         n_condns = 1  # number of conditions
-    elif dataset == 'pHD':
-        attribute = 'disease'  # name of attribute in npz archive
-        age_max = 87.72895277  # used for scaling age values
+    elif dataset == 'EATT':
+        attribute = 'attribute'  # name of attribute in npz archive
+        age_max = 74  # used for scaling age values
         n_condns = 3  # number of conditions
-
+    elif dataset == 'qsm-simple':
+        age_max = 34  # used for scaling age values
+        n_condns = 1  # number of conditions
+    elif dataset == 'qsm-gender-and-age':
+        attribute = 'gender'  # name of attribute in npz archive
+        age_max = 34  # used for scaling age values
+        n_condns = 3  # number of conditions
+        
     # Oversample age:
     if oversample_age is True:
         ifrequencies = oversample(img_list)

@@ -145,7 +145,7 @@ def Generator(
     conditional=True,
     normreg=False,
     atlas_model='ours',
-    input_resolution=[160, 192, 160, 1],
+    input_resolution=[48, 80, 80, 1],
     clip_bckgnd=True,
     initialization='default',
     n_condns=1,
@@ -211,14 +211,14 @@ def Generator(
     elif atlas_model == 'voxelmorph' and conditional is True:
         # vxm conditional model:
         # TODO: fix hardcoding
-        condn_emb_vxm = KL.Dense((80*96*80*8), activation='elu')(condn)
-        condn_emb_vxm = KL.Reshape((80, 96, 80, 8))(condn_emb_vxm)
+        condn_emb_vxm = KL.Dense((24*40*40*8), activation='elu')(condn)
+        condn_emb_vxm = KL.Reshape((24, 40, 40, 8))(condn_emb_vxm)
 
         # Atlas sharpening branch:
         dec_out = conv_dec(
             condn_emb_vxm,  # vxm optimized parameters
             8,
-            (80, 96, 80, 8),
+            (24, 40, 40, 8),
             2,
             [3, 3, 3],
             8,
@@ -257,7 +257,7 @@ def Generator(
         # Input layer of decoder: learned parameter vector
         const_vec = KL.Lambda(const_inp)(condn)  # use condn to get batch info
         condn_emb_vxm = KL.Dense(
-            (80 * 96 * 80 * 8),
+            (24 * 40 * 40 * 8),
             kernel_initializer=tf.keras.initializers.RandomNormal(
                 mean=0.0,
                 stddev=0.02,
@@ -269,7 +269,7 @@ def Generator(
         )(const_vec)
 
         # Reshape to feature map and FiLM for convolutional processing:
-        condn_emb_vxm = KL.Reshape((80, 96, 80, 8))(condn_emb_vxm)
+        condn_emb_vxm = KL.Reshape((24, 40, 40, 8))(condn_emb_vxm)
         condn_emb_vxm = FiLM(init=init)([condn_emb_vxm, condn_vec])
 
         # 5 ResBlocks at lower resolution:
@@ -293,7 +293,7 @@ def Generator(
             sres,
             condn_vec,
             8,
-            (80, 96, 80, 8),
+            (24, 40, 40, 8),
             2,
             [3, 3, 3],
             8,
@@ -320,7 +320,7 @@ def Generator(
         # Input layer of decoder: learned parameter vector
         const_vec = KL.Lambda(const_inp)(image_inputs)  # use ip for batch info
         condn_emb_vxm = KL.Dense(
-            (80 * 96 * 80 * 8),
+            (24 * 40 * 40 * 8),
             kernel_initializer=tf.keras.initializers.RandomNormal(
                 mean=0.0,
                 stddev=0.02,
@@ -331,7 +331,7 @@ def Generator(
             ),
         )(const_vec)
 
-        condn_emb_vxm = KL.Reshape((80, 96, 80, 8))(condn_emb_vxm)
+        condn_emb_vxm = KL.Reshape((24, 40, 40, 8))(condn_emb_vxm)
 
         # 5 ResBlocks at lower resolution:
         s1 = conv_block(
@@ -354,7 +354,7 @@ def Generator(
             sres,
             condn_vec,
             8,
-            (80, 96, 80, 8),
+            (24, 40, 40, 8),
             2,
             [3, 3, 3],
             8,
@@ -461,7 +461,7 @@ def Generator(
 def Discriminator(
     ch=32,
     conditional=True,
-    input_resolution=[160, 192, 160, 1],
+    input_resolution=[48, 80, 80, 1],
     sn_out=True,
     initialization='orthogonal',
     n_condns=1,

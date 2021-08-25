@@ -95,9 +95,9 @@ from src.optimizers import get_optimizers
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--epochs', type=int, default=200)
+parser.add_argument('--epochs', type=int, default=10)
 parser.add_argument('--batch_size', type=int, default=1)
-parser.add_argument('--dataset', type=str, default='dHCP')
+parser.add_argument('--dataset', type=str, default='EATT')
 parser.add_argument('--name', type=str, default='experiment_name')
 parser.add_argument('--d_train_steps', type=int, default=1)
 parser.add_argument('--g_train_steps', type=int, default=1)
@@ -114,7 +114,7 @@ parser.add_argument(
     '--nonorm_reg', dest='norm_reg', default=True, action='store_false',
 )
 parser.add_argument(
-    '--oversample', dest='oversample', default=True, action='store_false',
+    '--oversample', dest='oversample', default=False, action='store_false',
 )
 parser.add_argument(
     '--d_snout', dest='d_snout', default=False, action='store_true',
@@ -210,14 +210,19 @@ elif dataset == 'pHD':
     avg_path = './data/predict-hd/linearaverageof100.npz'
     n_condns = 3
 
+elif dataset == 'EATT':
+    fpath = '/mnt/FileSystem-DeepLearning/tom/Atlas-GAN/ourdata/*.npz'
+    avg_path = '/mnt/FileSystem-DeepLearning/tom/Atlas-GAN/EATT_data/average/average.npz'
+    n_condns = 3  
+
 else:
-    raise ValueError('dataset expected to be dHCP or pHD')
+    raise ValueError('dataset expected to be something else')
 
 
 img_paths = glob.glob(fpath)
 
 Dtrain_data_generator = D_data_generator(
-    vol_shape=(160, 192, 160),
+    vol_shape=(48, 80, 80), #FIXME
     img_list=img_paths,
     oversample_age=oversample,
     batch_size=batch_size,
@@ -225,7 +230,7 @@ Dtrain_data_generator = D_data_generator(
 )
 
 Gtrain_data_generator = G_data_generator(
-    vol_shape=(160, 192, 160),
+    vol_shape=(48, 80, 80), #FIXME 
     img_list=img_paths,
     oversample_age=oversample,
     batch_size=batch_size,
@@ -381,30 +386,30 @@ def gen_train_step(input_images, avg_input, input_condns, epoch):
     movedmax = tf.reduce_max(moved_atlases)
 
     tb_img = {
-        'atlas/1': tf.nn.relu(sharp_atlases[:, 80, :, :, :]) / atlasmax,
-        'atlas/2': tf.nn.relu(sharp_atlases[:, :, 96, :, :]) / atlasmax,
-        'atlas/3': tf.nn.relu(sharp_atlases[:, :, :, 70, :]) / atlasmax,
-        'moved_atlases/1': tf.nn.relu(moved_atlases[:, 80, :, :, :])/movedmax,
-        'moved_atlases/2': tf.nn.relu(moved_atlases[:, :, 96, :, :])/movedmax,
-        'moved_atlases/3': tf.nn.relu(moved_atlases[:, :, :, 70, :])/movedmax,
+        'atlas/1': tf.nn.relu(sharp_atlases[:, 24, :, :, :]) / atlasmax,
+        'atlas/2': tf.nn.relu(sharp_atlases[:, :, 40, :, :]) / atlasmax,
+        'atlas/3': tf.nn.relu(sharp_atlases[:, :, :, 40, :]) / atlasmax,
+        'moved_atlases/1': tf.nn.relu(moved_atlases[:, 24, :, :, :])/movedmax,
+        'moved_atlases/2': tf.nn.relu(moved_atlases[:, :, 40, :, :])/movedmax,
+        'moved_atlases/3': tf.nn.relu(moved_atlases[:, :, :, 40, :])/movedmax,
         'target_images/1':
             tf.image.convert_image_dtype(
-                input_images[:, 80, :, :, :], dtype=tf.uint8,
+                input_images[:, 24, :, :, :], dtype=tf.uint8,
             ),
         'target_images/2':
             tf.image.convert_image_dtype(
-                input_images[:, :, 96, :, :], dtype=tf.uint8,
+                input_images[:, :, 40, :, :], dtype=tf.uint8,
             ),
         'target_images/3':
             tf.image.convert_image_dtype(
-                input_images[:, :, :, 70, :], dtype=tf.uint8,
+                input_images[:, :, :, 40, :], dtype=tf.uint8,
             ),
     }
 
     tbimg_names = list(tb_img.keys())
 
     # Update tensorboard every 10 steps:
-    if (epoch % 10) == 0:
+    if (epoch % 1) == 0:
         with summary_writer.as_default():
             for i in range(len(tbscalarnames)):
                 tf.summary.scalar(

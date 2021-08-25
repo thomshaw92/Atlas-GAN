@@ -2,3 +2,4 @@ ourdata
 EATT_data
 logs
 training_checkpoints
+ext/*

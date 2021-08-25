@@ -17,7 +17,7 @@ We recommend setting up an anaconda environment and installing all dependencies 
 
 ```bash
 conda env create -f environment.yml
-conda activate tf2
+conda activate atlas-GAN
 ```
 
 ## Usage

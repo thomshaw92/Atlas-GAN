@@ -1,4 +1,4 @@
-name: tf2
+name: atlas-GAN
 channels:
   - conda-forge
   - defaults
