@@ -95,7 +95,7 @@ from src.optimizers import get_optimizers
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--epochs', type=int, default=10)
+parser.add_argument('--epochs', type=int, default=200)
 parser.add_argument('--batch_size', type=int, default=1)
 parser.add_argument('--dataset', type=str, default='EATT')
 parser.add_argument('--name', type=str, default='experiment_name')
